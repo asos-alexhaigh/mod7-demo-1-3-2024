@@ -395,46 +395,11 @@ public class AdminControllerShould
 }
 ```
 
-25. Create a class called RequestParser, and an interface called IRequestParser, in the `Data` folder of the WebApi project.
+25. In the `Data` folder of the WebApi project, open RequestParser.cs and uncomment the implementation code.
 
-Mention that normally you'll create _RequestParserShould_ unit tests and then drive it's behaviour from tests. To save time during the demo, we're adding a fully implemented  _RequestParser_. Note we need to write a bit of code to get around how Microsoft handles the `dynamic` parameter.
+Mention that normally you'll create _RequestParserShould_ unit tests and then drive it's behaviour from tests. To save time during the demo, we're adding a fully implemented  _RequestParser_. Don't bother going over how the parser works.
 
-```csharp
-// RequestParser.cs
-public class RequestParser : IRequestParser
-{
-    public LevelSpace Parse(dynamic value)
-    {
-        JsonNode data = JsonSerializer.Deserialize<JsonNode>(value);
-        string levelId = (string)data["Level"];
-        string spaceId = (string)data["Space"];
-
-        return new LevelSpace() { Level = new Level { Id = levelId }, Space = spaceId };
-    }
-}
-	
-// IRequestParser.cs
-public interface IRequestParser
-{
-    LevelSpace Parse(dynamic value);
-}
-```
-
-26. Add service registration to _Startup.cs_ for RequestParser:
-
-```csharp
-// Startup.cs
-public void ConfigureServices(IServiceCollection services)
-{
-    services.AddMvc(opt => opt.EnableEndpointRouting = false);
-
-    services.AddTransient<IRequestParser, RequestParser>();
-
-    _externalStartupConfigService.ConfigureService(services, null);
-}
-```
-
-27. We're now able to start our red/green/refactor process in the first inner loop. Update _AdminController_ class to implement a contructor:
+26. We're now able to start our red/green/refactor process in the first inner loop. Update _AdminController_ class to implement a contructor:
 
 ```csharp
 // AdminController.cs
@@ -448,9 +413,9 @@ public AdminController(IRequestParser requestParser, IDataAccess dataAccess)
 }
 ```
 
-28. Run your test and "ExtractIdsFromInput" should be red.
+27. Run your test and "ExtractIdsFromInput" should be red.
 
-29. Implement RequestParser call in the _AdminController_ then re-run your test; it should be green.
+28. Implement RequestParser call in the _AdminController_ then re-run your test; it should be green.
 
 ```csharp
 [HttpPost("space")]
@@ -460,7 +425,7 @@ public void Post([FromBody]object request)
 }
 ```
 
-30. We can now work on a second inner loop test. Add another unit test to _AdminControllerShould_:
+29. We can now work on a second inner loop test. Add another unit test to _AdminControllerShould_:
 
 ```csharp
 // AdminControllerShould.cs
@@ -486,7 +451,7 @@ public void ShouldCreateLevelIfItDoesNotExist()
 }
 ```
 
-31. Update implementation of Controller to check if level exists and add if not:
+30. Update implementation of Controller to check if level exists and add if not:
 
 ```csharp
 // AdminController.cs
@@ -503,9 +468,9 @@ public void Post([FromBody]object request)
 }
 ```
 
-32. Run the test; at this point it should be green.
+31. Run the test; at this point it should be green.
 
-33. We can now work on a third inner loop test. Create another unit test for adding LevelSpace:
+32. We can now work on a third inner loop test. Create another unit test for adding LevelSpace:
 
 ```csharp
 // AdminControllerShould.cs
@@ -533,7 +498,7 @@ public void ShouldCreateSpaceLevel()
 
 ```
 
-34. Implement adding LevelSpace in controller:
+33. Implement adding LevelSpace in controller:
 ```csharp
 // AdminController.cs
 [HttpPost("space")]
@@ -550,6 +515,6 @@ public void Post([FromBody]object request)
 }
 ```
 
-35. Run all the tests, including the acceptance test that was previously red. It should now be green and passing for the right reason.
+34. Run all the tests, including the acceptance test that was previously red. It should now be green and passing for the right reason.
 
 Speak about how unit tests play a role in the cycle (and mocking). Point out that the acceptance test is also passing as we have met all the acceptance criteria, by driving the implementation of the inner workings of our applications by doing TDD in the inner loop, which then brings us back to a green test in the outer loop. 
