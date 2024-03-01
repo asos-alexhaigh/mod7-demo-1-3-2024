@@ -6,6 +6,7 @@ namespace ParkYourLark.WebApi.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
-
+        [HttpPost("space")]
+        public void Post([FromBody] object request) { }
     }
 }
